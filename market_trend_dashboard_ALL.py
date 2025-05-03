@@ -45,7 +45,10 @@ if 'Close' not in data.columns:
 
 # Ensure 'Close' column is numeric and handle any non-numeric values
 try:
+    # Check the type of the 'Close' column before conversion
+    st.write("Type of 'Close' column before conversion:", type(data['Close']))
     data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+    st.write("Type of 'Close' column after conversion:", type(data['Close']))
 except Exception as e:
     st.error(f"Error converting 'Close' column to numeric: {e}")
     st.stop()
@@ -98,8 +101,6 @@ st.subheader("Technical Indicators")
 st.line_chart(data[['SMA', 'RSI']])
 
 st.markdown(
-    '''
+    """
 ---
-*Note: The ticker list is a sample. For a comprehensive live stock list, replace the `get_stock_tickers` function with a method to load tickers from a reliable source such as an updated CSV file or an API.*
-'''
-)
+*Note: The
