@@ -43,12 +43,14 @@ if 'Close' not in data.columns:
     st.error("The 'Close' column is missing from the data. Please check the ticker symbol.")
     st.stop()
 
+# Check the type and contents of the 'Close' column
+st.write("Contents of 'Close' column:")
+st.write(data['Close'])
+
 # Ensure 'Close' column is numeric and handle any non-numeric values
 try:
-    # Check the type of the 'Close' column before conversion
-    st.write("Type of 'Close' column before conversion:", type(data['Close']))
+    # Convert 'Close' column to numeric
     data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
-    st.write("Type of 'Close' column after conversion:", type(data['Close']))
 except Exception as e:
     st.error(f"Error converting 'Close' column to numeric: {e}")
     st.stop()
