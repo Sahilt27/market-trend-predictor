@@ -103,4 +103,6 @@ st.line_chart(data[['SMA', 'RSI']])
 st.markdown(
     """
 ---
-*Note: The
+*Note: The ticker list is a sample. For a comprehensive live stock list, replace the `get_stock_tickers` function with a method to load tickers from a reliable source such as an updated CSV file or an API.*
+"""
+)
