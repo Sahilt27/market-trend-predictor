@@ -21,11 +21,16 @@ if data.empty:
     st.error("No data found. Please check the ticker symbol.")
     st.stop()
 
-# Convert 'Close' to numeric and handle any non-numeric values
+# Ensure 'Close' column is numeric and handle any non-numeric values
 data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
 
-# Drop rows with NaN values in the 'Close' column
+# Drop rows with NaN values in 'Close'
 data = data.dropna(subset=['Close'])
+
+# Check if there are enough data points for SMA (window=14)
+if len(data) < 14:
+    st.error("Not enough data points for SMA calculation. Please select a larger date range.")
+    st.stop()
 
 # Add technical indicators
 data['SMA'] = ta.trend.sma_indicator(data['Close'], window=14)
