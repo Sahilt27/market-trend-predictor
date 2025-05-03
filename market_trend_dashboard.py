@@ -49,3 +49,9 @@ st.success(trend)
 
 st.subheader("Technical Indicators")
 st.line_chart(data[['SMA', 'RSI']])
+# Fill NaN values with the previous available value (or use another method)
+data['Close'].fillna(method='ffill', inplace=True)
+
+# Apply the SMA and other indicators
+data['SMA'] = ta.trend.sma_indicator(data['Close'], window=14)
+data['RSI'] = ta.momentum.rsi(data['Close'], window=14)
