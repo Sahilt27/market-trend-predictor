@@ -51,6 +51,8 @@ st.write(data['Close'])
 try:
     # Convert 'Close' column to numeric
     data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+    st.write("Converted 'Close' column:")
+    st.write(data['Close'])
 except Exception as e:
     st.error(f"Error converting 'Close' column to numeric: {e}")
     st.stop()
@@ -103,6 +105,7 @@ st.subheader("Technical Indicators")
 st.line_chart(data[['SMA', 'RSI']])
 
 st.markdown(
+   
     """
 ---
 *Note: The ticker list is a sample. For a comprehensive live stock list, replace the `get_stock_tickers` function with a method to load tickers from a reliable source such as an updated CSV file or an API.*
