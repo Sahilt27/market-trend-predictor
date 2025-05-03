@@ -17,37 +17,44 @@ end_date = st.sidebar.date_input("End Date", value=pd.to_datetime("2023-12-31"))
 # Load data
 data = yf.download(ticker, start=start_date, end=end_date)
 
-# Check if data is empty
-if data.empty:
-    st.error("No data found. Please check the ticker symbol.")
+# Debug: Show columns to understand structure
+st.write("Data columns:", data.columns)
+
+# Handle multi-index columns if present
+if isinstance(data.columns, pd.MultiIndex):
+    # Flatten multi-index columns by joining with underscore
+    data.columns = ['_'.join(col).strip() for col in data.columns.values]
+
+# After flattening, try to locate 'Close' or 'Close_<ticker>' column
+close_col_candidates = [col for col in data.columns if 'Close' in col]
+if not close_col_candidates:
+    st.error("No 'Close' column found in the data, please check the ticker symbol and data availability.")
     st.stop()
 
-# Check if 'Close' column exists
-if 'Close' not in data.columns:
-    st.error("The 'Close' column is missing from the data. Please check the ticker symbol.")
-    st.stop()
+# Use the first candidate 'Close' column
+close_col = close_col_candidates[0]
 
 # Ensure 'Close' column is numeric and handle any non-numeric values
 try:
-    data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+    data[close_col] = pd.to_numeric(data[close_col], errors='coerce')
 except Exception as e:
-    st.error(f"Error converting 'Close' column to numeric: {e}")
+    st.error(f"Error converting '{close_col}' column to numeric: {e}")
     st.stop()
 
 # Drop rows with NaN values in 'Close'
-data = data.dropna(subset=['Close'])
+data = data.dropna(subset=[close_col])
 
 # Check if there are enough data points for SMA (window=14)
 if len(data) < 14:
     st.error("Not enough data points for SMA calculation. Please select a larger date range.")
     st.stop()
 
-# Add technical indicators
-data['SMA'] = ta.trend.sma_indicator(data['Close'], window=14)
-data['RSI'] = ta.momentum.rsi(data['Close'], window=14)
+# Add technical indicators on close_col
+data['SMA'] = ta.trend.sma_indicator(data[close_col], window=14)
+data['RSI'] = ta.momentum.rsi(data[close_col], window=14)
 
 # Trend column (1 if next day is up, 0 if down)
-data['Trend'] = (data['Close'].shift(-1) > data['Close']).astype(int)
+data['Trend'] = (data[close_col].shift(-1) > data[close_col]).astype(int)
 data = data.dropna()
 
 # Features and target for the model
@@ -73,7 +80,7 @@ trend = "🔼 Uptrend Expected" if pred == 1 else "🔽 Downtrend Expected"
 
 # Display results
 st.subheader("Close Price Chart")
-st.line_chart(data['Close'])
+st.line_chart(data[close_col])
 
 st.subheader("Latest Prediction")
 st.success(trend)
