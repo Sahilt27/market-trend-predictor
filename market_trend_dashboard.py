@@ -22,8 +22,17 @@ if data.empty:
     st.error("No data found. Please check the ticker symbol.")
     st.stop()
 
+# Check if 'Close' column exists
+if 'Close' not in data.columns:
+    st.error("The 'Close' column is missing from the data. Please check the ticker symbol.")
+    st.stop()
+
 # Ensure 'Close' column is numeric and handle any non-numeric values
-data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+try:
+    data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+except Exception as e:
+    st.error(f"Error converting 'Close' column to numeric: {e}")
+    st.stop()
 
 # Drop rows with NaN values in 'Close'
 data = data.dropna(subset=['Close'])
