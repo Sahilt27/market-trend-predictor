@@ -34,6 +34,10 @@ if data.empty:
     st.error("No data found. Please check the ticker symbol or try another.")
     st.stop()
 
+# Display the structure of the DataFrame for debugging
+st.write("Data fetched from Yahoo Finance:")
+st.write(data)
+
 # Check if 'Close' column exists
 if 'Close' not in data.columns:
     st.error("The 'Close' column is missing from the data. Please check the ticker symbol.")
@@ -95,5 +99,4 @@ st.line_chart(data[['SMA', 'RSI']])
 
 st.markdown("""
 ---
-*Note: The ticker list is a sample. For a comprehensive live stock list, replace the `get_stock_tickers` function with a method to load tickers from a reliable source such as an updated CSV file or an API.*
-""")
+*Note: The ticker list is a sample. For a comprehensive live stock list, replace the `get_stock_tickers` function with a method to load tickers from a reliable source such
