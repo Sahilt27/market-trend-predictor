@@ -15,11 +15,19 @@ end_date = st.sidebar.date_input("End Date", value=pd.to_datetime("2023-12-31"))
 
 # Load data
 data = yf.download(ticker, start=start_date, end=end_date)
+
+# Check if data is empty
 if data.empty:
     st.error("No data found. Please check the ticker symbol.")
     st.stop()
 
-# Technical indicators
+# Convert 'Close' to numeric and handle any non-numeric values
+data['Close'] = pd.to_numeric(data['Close'], errors='coerce')
+
+# Drop rows with NaN values in the 'Close' column
+data = data.dropna(subset=['Close'])
+
+# Add technical indicators
 data['SMA'] = ta.trend.sma_indicator(data['Close'], window=14)
 data['RSI'] = ta.momentum.rsi(data['Close'], window=14)
 
@@ -27,11 +35,11 @@ data['RSI'] = ta.momentum.rsi(data['Close'], window=14)
 data['Trend'] = (data['Close'].shift(-1) > data['Close']).astype(int)
 data = data.dropna()
 
-# Features and target
+# Features and target for the model
 X = data[['SMA', 'RSI']]
 y = data['Trend']
 
-# Model training
+# Train a RandomForest model
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 model = RandomForestClassifier(n_estimators=100).fit(X_train, y_train)
 
@@ -49,9 +57,3 @@ st.success(trend)
 
 st.subheader("Technical Indicators")
 st.line_chart(data[['SMA', 'RSI']])
-# Fill NaN values with the previous available value (or use another method)
-data['Close'].fillna(method='ffill', inplace=True)
-
-# Apply the SMA and other indicators
-data['SMA'] = ta.trend.sma_indicator(data['Close'], window=14)
-data['RSI'] = ta.momentum.rsi(data['Close'], window=14)
